@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+  psql:
+    container_name: db
+    image: "postgres:14.1-alpine"
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=semih
+      - POSTGRES_PASSWORD=Tc7txgG&7NRB4+m2
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./pgsql-data:/var/lib/postgresql/data:rw
+
+  django-backend:
+    container_name: backend
+    build:
+      context: ./backend
+    env_file:
+      - ./backend/.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - psql
+    volumes:
+      - ./backend:/backend
+
+  react:
+    container_name: frontend
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend/src:/frontend/src
+    depends_on:
+      - django-backend
